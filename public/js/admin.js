@@ -115,16 +115,16 @@ async function loadDashboard() {
         const res = await authFetch('/api/admin/dashboard');
         const data = await res.json();
         
-        document.getElementById('stat-students').textContent = data.totalStudents || 0;
-        document.getElementById('stat-subjects').textContent = data.totalSubjects || 0;
-        document.getElementById('stat-sessions').textContent = data.todaySessions || 0;
-        document.getElementById('stat-attendance').textContent = data.todayAttendance || 0;
+        document.getElementById('stat-students').textContent = data.stats.totalStudents || 0;
+        document.getElementById('stat-subjects').textContent = data.stats.totalSubjects || 0;
+        document.getElementById('stat-sessions').textContent = data.stats.todaySessions || 0;
+        document.getElementById('stat-attendance').textContent = data.stats.todayAttendance || 0;
         
         const tbody = document.getElementById('recent-attendance-body');
         if (data.recentAttendance && data.recentAttendance.length > 0) {
             tbody.innerHTML = data.recentAttendance.map(record => `
                 <tr>
-                    <td>${record.student_name}</td>
+                    <td>${record.full_name}</td>
                     <td>${record.student_code}</td>
                     <td>${record.subject_name}</td>
                     <td>${formatTime(record.check_in_time)}</td>
