@@ -52,7 +52,9 @@ router.use(authMiddleware);
 router.get('/dashboard', (req, res) => {
     try {
         const db = getDb();
-        const today = new Date().toISOString().split('T')[0];
+        const vnTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+        const vnDateObj = new Date(vnTime);
+        const today = `${vnDateObj.getFullYear()}-${String(vnDateObj.getMonth() + 1).padStart(2, '0')}-${String(vnDateObj.getDate()).padStart(2, '0')}`;
         
         const totalStudents = db.prepare('SELECT COUNT(*) as count FROM students').get().count;
         const totalSubjects = db.prepare('SELECT COUNT(*) as count FROM subjects').get().count;

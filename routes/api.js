@@ -123,7 +123,10 @@ router.post('/attendance/check-in', (req, res) => {
             return res.status(400).json({ error: 'Buổi học đã đóng' });
         }
         
-        const today = new Date().toISOString().split('T')[0];
+        const vnTime = new Date().toLocaleString("en-US", {timeZone: "Asia/Ho_Chi_Minh"});
+        const vnDateObj = new Date(vnTime);
+        const today = `${vnDateObj.getFullYear()}-${String(vnDateObj.getMonth() + 1).padStart(2, '0')}-${String(vnDateObj.getDate()).padStart(2, '0')}`;
+        
         if (session.session_date !== today) {
             return res.status(400).json({ error: 'Buổi học không diễn ra vào hôm nay' });
         }
