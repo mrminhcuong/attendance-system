@@ -51,6 +51,12 @@ router.post('/register-device', (req, res) => {
             return res.status(404).json({ error: 'Không tìm thấy sinh viên' });
         }
 
+        // CHỐNG ĐIỂM DANH HỘ: Kiểm tra xem sinh viên này đã đăng ký thiết bị nào chưa
+        const studentDevice = db.prepare('SELECT device_fingerprint FROM devices WHERE student_id = ?').get(student.id);
+        if (studentDevice && studentDevice.device_fingerprint !== deviceFingerprint) {
+            return res.status(403).json({ error: 'Mã sinh viên này đã được đăng ký trên thiết bị khác' });
+        }
+
         const existingDevice = db.prepare('SELECT id FROM devices WHERE device_fingerprint = ?').get(deviceFingerprint);
         
         const deviceInfoStr = deviceInfo ? JSON.stringify(deviceInfo) : null;

@@ -61,7 +61,8 @@ function showToast(message, type = 'success') {
 
 function formatDateTime(dateStr) {
     if (!dateStr) return '';
-    const date = new Date(dateStr);
+    const utcStr = (dateStr.length === 19 && dateStr.includes(' ')) ? dateStr.replace(' ', 'T') + 'Z' : dateStr;
+    const date = new Date(utcStr);
     return date.toLocaleString('vi-VN', {
         year: 'numeric',
         month: '2-digit',
@@ -74,11 +75,11 @@ function formatDateTime(dateStr) {
 
 function formatTime(timeStr) {
     if (!timeStr) return '';
-    const date = new Date(timeStr);
+    const utcStr = (timeStr.length === 19 && timeStr.includes(' ')) ? timeStr.replace(' ', 'T') + 'Z' : timeStr;
+    const date = new Date(utcStr);
     return date.toLocaleTimeString('vi-VN', {
         hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
+        minute: '2-digit'
     });
 }
 
