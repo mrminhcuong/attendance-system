@@ -41,14 +41,28 @@ router.post('/check-device', (req, res) => {
 router.post('/register-device', (req, res) => {
     try {
         const db = getDb();
-        const { deviceFingerprint, studentCode, deviceInfo } = req.body;
-        if (!deviceFingerprint || !studentCode) {
+        const { deviceFingerprint, studentCode, full_name, email, deviceInfo } = req.body;
+        if (!deviceFingerprint || !studentCode || !full_name) {
             return res.status(400).json({ error: 'Thiếu thông tin yêu cầu' });
         }
 
-        const student = db.prepare('SELECT * FROM students WHERE student_code = ?').get(studentCode);
+        let student = db.prepare('SELECT * FROM students WHERE student_code = ?').get(studentCode);
+        
+        // TỰ ĐỘNG THÊM SINH VIÊN MỚI NẾU CHƯA TỒN TẠI
         if (!student) {
-            return res.status(404).json({ error: 'Không tìm thấy sinh viên' });
+            const result = db.prepare('INSERT INTO students (student_code, full_name, email) VALUES (?, ?, ?)')
+                             .run(studentCode, full_name, email || null);
+            student = {
+                id: result.lastInsertRowid,
+                student_code: studentCode,
+                full_name: full_name,
+                class_name: null
+            };
+        } else {
+            // Cập nhật email nếu có và chưa có email
+            if (email && !student.email) {
+                db.prepare('UPDATE students SET email = ? WHERE id = ?').run(email, student.id);
+            }
         }
 
         // CHỐNG ĐIỂM DANH HỘ: Kiểm tra xem sinh viên này đã đăng ký thiết bị nào chưa

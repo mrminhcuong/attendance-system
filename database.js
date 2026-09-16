@@ -188,10 +188,14 @@ async function initDatabase() {
     `);
 
     // Seed Admin
+    const defaultPassword = process.env.ADMIN_DEFAULT_PASSWORD || 'adminbp123!@#';
+    const hash = bcrypt.hashSync(defaultPassword, 10);
+    
     const checkAdmin = dbWrapper.prepare('SELECT * FROM admins WHERE username = ?').get('admin');
     if (!checkAdmin) {
-        const hash = bcrypt.hashSync('admin123', 10);
         dbWrapper.prepare('INSERT INTO admins (username, password_hash) VALUES (?, ?)').run('admin', hash);
+    } else {
+        dbWrapper.prepare('UPDATE admins SET password_hash = ? WHERE username = ?').run(hash, 'admin');
     }
 
     // Seed Subjects

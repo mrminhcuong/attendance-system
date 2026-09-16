@@ -54,8 +54,16 @@
             <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px;">Thiết bị này chưa được liên kết với mã sinh viên nào. Vui lòng nhập mã sinh viên để tiếp tục điểm danh.</p>
             <form id="register-form">
                 <div class="form-group">
-                    <label for="student_code">Mã sinh viên:</label>
-                    <input type="text" id="student_code" name="student_code" required placeholder="Nhập mã sinh viên của bạn">
+                    <label for="student_code">Mã sinh viên *:</label>
+                    <input type="text" id="student_code" name="student_code" required placeholder="Ví dụ: 23BI14467">
+                </div>
+                <div class="form-group">
+                    <label for="full_name">Họ và tên *:</label>
+                    <input type="text" id="full_name" name="full_name" required placeholder="Nhập họ và tên của bạn">
+                </div>
+                <div class="form-group">
+                    <label for="email">Email *:</label>
+                    <input type="email" id="email" name="email" required placeholder="Nhập địa chỉ email của bạn">
                 </div>
                 <button type="submit" class="btn">Đăng ký & Điểm danh</button>
                 <button type="button" class="btn btn-secondary" onclick="resetScanner()">Hủy</button>

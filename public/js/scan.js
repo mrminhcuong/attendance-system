@@ -14,8 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const studentCode = document.getElementById('student_code').value.trim();
-        if (!studentCode) {
-            showToast('Vui lòng nhập mã sinh viên', 'error');
+        const fullName = document.getElementById('full_name').value.trim();
+        const email = document.getElementById('email').value.trim();
+
+        if (!studentCode || !fullName || !email) {
+            showToast('Vui lòng nhập đầy đủ thông tin', 'error');
             return;
         }
 
@@ -27,7 +30,13 @@ document.addEventListener('DOMContentLoaded', () => {
             // Register device
             await apiCall('/api/register-device', {
                 method: 'POST',
-                body: JSON.stringify({ deviceFingerprint: fingerprint, studentCode, deviceInfo })
+                body: JSON.stringify({ 
+                    deviceFingerprint: fingerprint, 
+                    studentCode, 
+                    full_name: fullName, 
+                    email: email,
+                    deviceInfo 
+                })
             });
 
             // Perform check-in immediately after registration
