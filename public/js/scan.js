@@ -14,8 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             showLoading();
-            const fingerprint = await window.DeviceFingerprint.getFingerprint();
-            const deviceInfo = window.DeviceFingerprint.getDeviceInfo();
+            const fingerprint = await window.DeviceIdentity.getFingerprint();
+            const deviceInfo = window.DeviceIdentity.getDeviceInfo();
 
             // Register device
             await apiCall('/api/register-device', {
@@ -60,7 +60,7 @@ async function onScanSuccess(decodedText, decodedResult) {
         hideElement('qr-reader');
         showLoading();
 
-        const fingerprint = await window.DeviceFingerprint.getFingerprint();
+        const fingerprint = await window.DeviceIdentity.getFingerprint();
         
         const deviceCheck = await apiCall('/api/check-device', {
             method: 'POST',

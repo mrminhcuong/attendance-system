@@ -1,4 +1,4 @@
-class DeviceFingerprint {
+class DeviceIdentity {
     constructor() {
         this.deviceIdKey = 'device_id';
     }
@@ -105,4 +105,4 @@ class DeviceFingerprint {
     }
 }
 
-window.DeviceFingerprint = new DeviceFingerprint();
+window.DeviceIdentity = new DeviceIdentity();

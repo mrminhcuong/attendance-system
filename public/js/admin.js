@@ -479,11 +479,11 @@ async function loadSessions() {
         const tbody = document.getElementById('sessions-body');
         if (data && data.length > 0) {
             tbody.innerHTML = data.map((sess, index) => {
-                const statusBadge = sess.is_active ? 
+                const statusBadge = sess.status === 'active' ? 
                     '<span class="badge badge-success">Đang mở</span>' : 
                     '<span class="badge badge-danger">Đã đóng</span>';
                     
-                const actionBtns = sess.is_active ? 
+                const actionBtns = sess.status === 'active' ? 
                     `<button class="btn btn-sm btn-primary" onclick="showQRCode(${sess.id})">Xem QR</button>
                      <button class="btn btn-sm btn-warning" onclick="closeSession(${sess.id})">Đóng điểm danh</button>` :
                     `<button class="btn btn-sm btn-outline" disabled>Đã đóng</button>`;
@@ -492,7 +492,7 @@ async function loadSessions() {
                     <tr>
                         <td>${index + 1}</td>
                         <td>${sess.subject_name}</td>
-                        <td>${formatDate(sess.date)}</td>
+                        <td>${formatDate(sess.session_date)}</td>
                         <td>${sess.start_time}</td>
                         <td>${sess.end_time}</td>
                         <td>${statusBadge}</td>
@@ -606,9 +606,9 @@ async function showQRCode(id) {
         const res = await authFetch(`/api/admin/sessions/${id}/qr`);
         const data = await res.json();
         
-        if(res.ok && data.qrCodeUrl) {
-            document.getElementById('qrImage').src = data.qrCodeUrl;
-            document.getElementById('downloadQR').href = data.qrCodeUrl;
+        if(res.ok && data.qrCode) {
+            document.getElementById('qrImage').src = data.qrCode;
+            document.getElementById('downloadQR').href = data.qrCode;
             
             // Try to get session info for display
             try {
@@ -616,7 +616,7 @@ async function showQRCode(id) {
                 const sessions = await sessRes.json();
                 const s = sessions.find(x => x.id == id);
                 if(s) {
-                    document.getElementById('qrInfo').textContent = `${s.subject_name} | ${formatDate(s.date)} (${s.start_time}-${s.end_time})`;
+                    document.getElementById('qrInfo').textContent = `${s.subject_name} | ${formatDate(s.session_date)} (${s.start_time}-${s.end_time})`;
                 }
             } catch(e){}
             
