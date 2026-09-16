@@ -363,8 +363,11 @@ router.get('/sessions/:id/qr', async (req, res) => {
         const session = db.prepare('SELECT id, qr_token FROM sessions WHERE id = ?').get(parseInt(req.params.id));
         if (!session) return res.status(404).json({ error: 'Không tìm thấy buổi học' });
 
-        const qrData = JSON.stringify({ token: session.qr_token, session_id: session.id });
-        const qrCode = await QRCode.toDataURL(qrData, { width: 400, margin: 2 });
+        const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+        const host = req.headers['host'];
+        const fullUrl = `${protocol}://${host}/scan.html?token=${session.qr_token}`;
+        
+        const qrCode = await QRCode.toDataURL(fullUrl, { width: 400, margin: 2 });
 
         res.json({ qrCode, session });
     } catch (error) {

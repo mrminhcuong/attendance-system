@@ -2,7 +2,14 @@ let html5QrcodeScanner;
 let currentQrToken = null;
 
 document.addEventListener('DOMContentLoaded', () => {
-    initScanner();
+    const urlParams = new URLSearchParams(window.location.search);
+    const tokenFromUrl = urlParams.get('token');
+    
+    if (tokenFromUrl) {
+        processCheckInToken(tokenFromUrl);
+    } else {
+        initScanner();
+    }
 
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -37,6 +44,10 @@ function initScanner() {
     hideElement('register-section');
     showElement('qr-reader');
     
+    // Check if URL has token to avoid starting camera unnecessarily
+    const urlParams = new URLSearchParams(window.location.search);
+    if(urlParams.get('token')) return;
+
     html5QrcodeScanner = new Html5QrcodeScanner(
         "qr-reader",
         { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 },
@@ -45,18 +56,9 @@ function initScanner() {
     html5QrcodeScanner.render(onScanSuccess, onScanFailure);
 }
 
-async function onScanSuccess(decodedText, decodedResult) {
+async function processCheckInToken(token) {
     try {
-        const qrData = JSON.parse(decodedText);
-        if (!qrData.token) {
-            throw new Error("Mã QR không hợp lệ");
-        }
-        
-        if (html5QrcodeScanner) {
-            await html5QrcodeScanner.clear();
-        }
-        
-        currentQrToken = qrData.token;
+        currentQrToken = token;
         hideElement('qr-reader');
         showLoading();
 
@@ -74,6 +76,37 @@ async function onScanSuccess(decodedText, decodedResult) {
             showElement('register-section');
             document.getElementById('student_code').focus();
         }
+    } catch (error) {
+        console.error(error);
+        hideLoading();
+        showToast(error.message || 'Lỗi hệ thống', 'error');
+        setTimeout(() => {
+            window.history.replaceState({}, document.title, window.location.pathname); // clear token from url
+            initScanner();
+        }, 2000);
+    }
+}
+
+async function onScanSuccess(decodedText, decodedResult) {
+    try {
+        let token = null;
+        if (decodedText.startsWith('http')) {
+            const url = new URL(decodedText);
+            token = url.searchParams.get('token');
+        } else {
+            const qrData = JSON.parse(decodedText);
+            token = qrData.token;
+        }
+
+        if (!token) {
+            throw new Error("Mã QR không hợp lệ");
+        }
+        
+        if (html5QrcodeScanner) {
+            await html5QrcodeScanner.clear();
+        }
+        
+        await processCheckInToken(token);
     } catch (error) {
         console.error(error);
         if (html5QrcodeScanner) {
