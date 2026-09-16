@@ -671,7 +671,7 @@ async function loadAttendance() {
                     <tr>
                         <td>${index + 1}</td>
                         <td>${record.student_code}</td>
-                        <td>${record.student_name}</td>
+                        <td>${record.full_name}</td>
                         <td>${record.class_name || ''}</td>
                         <td>${record.subject_name} (${formatDate(record.session_date)})</td>
                         <td>${record.check_in_time ? formatTime(record.check_in_time) : '-'}</td>

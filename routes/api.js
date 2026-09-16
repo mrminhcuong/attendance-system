@@ -110,7 +110,7 @@ router.post('/attendance/check-in', (req, res) => {
 
         // Get student from device
         const device = db.prepare(`
-            SELECT d.*, st.student_code, st.full_name
+            SELECT d.*, st.student_code, st.full_name, st.class_name
             FROM devices d
             JOIN students st ON d.student_id = st.id
             WHERE d.device_fingerprint = ?
@@ -138,7 +138,8 @@ router.post('/attendance/check-in', (req, res) => {
             success: true,
             student: {
                 student_code: device.student_code,
-                full_name: device.full_name
+                full_name: device.full_name,
+                class_name: device.class_name
             },
             checkInTime: new Date().toISOString()
         });

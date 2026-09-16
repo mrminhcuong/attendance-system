@@ -135,9 +135,9 @@ async function performCheckIn(fingerprint, qrToken) {
         
         const infoDisplay = document.getElementById('student-info-display');
         infoDisplay.innerHTML = `
-            <p><strong>Họ Tên:</strong> ${result.studentName || 'Không rõ'}</p>
-            <p><strong>Mã SV:</strong> ${result.studentCode || 'Không rõ'}</p>
-            <p><strong>Lớp:</strong> ${result.className || 'Không rõ'}</p>
+            <p><strong>Họ Tên:</strong> ${result.student?.full_name || 'Không rõ'}</p>
+            <p><strong>Mã SV:</strong> ${result.student?.student_code || 'Không rõ'}</p>
+            <p><strong>Lớp:</strong> ${result.student?.class_name || 'Không rõ'}</p>
             <p><strong>Thời gian:</strong> ${formatDateTime(result.checkInTime || new Date().toISOString())}</p>
         `;
         
