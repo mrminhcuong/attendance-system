@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span>Quản trị viên</span>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html" class="active">Bảng điều khiển</a></li>
+                <li><a href="students.html">Sinh viên</a></li>
+                <li><a href="subjects.html">Môn học</a></li>
+                <li><a href="sessions.html">Buổi học & QR</a></li>
+                <li><a href="attendance.html">Điểm danh</a></li>
+                <li><a href="#" onclick="logout(); return false;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="page-header">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 class="page-title">Bảng điều khiển</h1>
+                <div class="user-info">
+                    <span>Admin</span>
+                </div>
+            </header>
+
+            <div class="content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon primary">👥</div>
+                        <div class="stat-info">
+                            <h3>Tổng sinh viên</h3>
+                            <div class="stat-value" id="stat-students">...</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">📚</div>
+                        <div class="stat-info">
+                            <h3>Tổng môn học</h3>
+                            <div class="stat-value" id="stat-subjects">...</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">📅</div>
+                        <div class="stat-info">
+                            <h3>Buổi học hôm nay</h3>
+                            <div class="stat-value" id="stat-sessions">...</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">✓</div>
+                        <div class="stat-info">
+                            <h3>Điểm danh hôm nay</h3>
+                            <div class="stat-value" id="stat-attendance">...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <span>Lịch sử điểm danh gần đây</span>
+                        <div>
+                            <a href="sessions.html" class="btn btn-primary btn-sm">Tạo buổi học mới</a>
+                            <a href="students.html" class="btn btn-outline btn-sm">Thêm sinh viên</a>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Sinh viên</th>
+                                        <th>Mã SV</th>
+                                        <th>Môn học</th>
+                                        <th>Thời gian</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-attendance-body">
+                                    <tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Toasts container -->
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

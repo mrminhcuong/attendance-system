@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý buổi học & QR - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><span>Quản trị viên</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Bảng điều khiển</a></li>
+                <li><a href="students.html">Sinh viên</a></li>
+                <li><a href="subjects.html">Môn học</a></li>
+                <li><a href="sessions.html" class="active">Buổi học & QR</a></li>
+                <li><a href="attendance.html">Điểm danh</a></li>
+                <li><a href="#" onclick="logout(); return false;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 class="page-title">Quản lý buổi học & QR</h1>
+                <div class="user-info"><span>Admin</span></div>
+            </header>
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="search-bar" style="display: flex; gap: 10px; align-items: center;">
+                            <select id="filterSubject" class="form-control" style="width: 200px;">
+                                <option value="">Tất cả môn học</option>
+                            </select>
+                            <input type="date" id="filterDate" class="form-control" style="width: 150px;">
+                            <button class="btn btn-outline" onclick="loadSessions()">Lọc</button>
+                        </div>
+                        <button class="btn btn-primary" onclick="openCreateSessionModal()">Tạo buổi học mới</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Môn học</th>
+                                        <th>Ngày</th>
+                                        <th>Giờ bắt đầu</th>
+                                        <th>Giờ kết thúc</th>
+                                        <th>Trạng thái</th>
+                                        <th>Số điểm danh</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sessions-body">
+                                    <tr><td colspan="8" style="text-align: center;">Đang tải...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Session Modal -->
+    <div class="modal-overlay" id="sessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Tạo buổi học mới</h3>
+                <button class="modal-close" onclick="closeModal('sessionModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="sessionForm">
+                    <div class="form-group">
+                        <label class="form-label">Môn học *</label>
+                        <select id="sessionSubject" class="form-control" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Ngày học *</label>
+                        <input type="date" id="sessionDate" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label class="form-label">Giờ bắt đầu *</label>
+                            <input type="time" id="startTime" class="form-control" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label class="form-label">Giờ kết thúc *</label>
+                            <input type="time" id="endTime" class="form-control" required>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('sessionModal')">Hủy</button>
+                <button class="btn btn-primary" onclick="createSession()">Tạo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Mã QR Điểm danh</h3>
+                <button class="modal-close" onclick="closeModal('qrModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="qrInfo" style="text-align: center; margin-bottom: 15px; font-weight: bold;"></div>
+                <div class="qr-container" id="qrContainer">
+                    <img id="qrImage" src="" alt="QR Code" style="max-width: 300px;">
+                </div>
+                <div style="text-align: center; margin-top: 15px; font-size: 0.9em; color: var(--danger);">
+                    Sinh viên cần quét mã này trong thời gian buổi học để điểm danh.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('qrModal')">Đóng</button>
+                <button class="btn btn-primary" onclick="printQR()">In QR</button>
+                <a id="downloadQR" href="#" download="QRCode.png" class="btn btn-success">Tải QR</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteSessionModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Xác nhận xóa</h3>
+                <button class="modal-close" onclick="closeModal('deleteSessionModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa buổi học này không?</p>
+                <input type="hidden" id="deleteSessionId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteSessionModal')">Hủy</button>
+                <button class="btn btn-danger" onclick="confirmDeleteSession()">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+
+    <script src="../js/admin.js"></script>
+    <script>
+        function printQR() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

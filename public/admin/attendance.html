@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dữ liệu điểm danh - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><span>Quản trị viên</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Bảng điều khiển</a></li>
+                <li><a href="students.html">Sinh viên</a></li>
+                <li><a href="subjects.html">Môn học</a></li>
+                <li><a href="sessions.html">Buổi học & QR</a></li>
+                <li><a href="attendance.html" class="active">Điểm danh</a></li>
+                <li><a href="#" onclick="logout(); return false;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 class="page-title">Dữ liệu điểm danh</h1>
+                <div class="user-info"><span>Admin</span></div>
+            </header>
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="search-bar" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                            <select id="filterSubject" class="form-control" style="width: 200px;">
+                                <option value="">Tất cả môn học</option>
+                            </select>
+                            <input type="date" id="filterDate" class="form-control" style="width: 150px;">
+                            <input type="text" id="searchStudent" class="form-control" placeholder="Tìm sinh viên..." style="width: 200px;">
+                            <button class="btn btn-outline" onclick="loadAttendance()">Lọc</button>
+                            <button class="btn btn-primary" onclick="loadAttendanceReport()">Xem Báo Cáo</button>
+                        </div>
+                        <button class="btn btn-success" onclick="exportCSV()">Xuất CSV</button>
+                    </div>
+                    
+                    <div class="card-body" id="summarySection" style="display: none; background: var(--gray-50); padding: 15px; margin-bottom: 20px; border-radius: var(--radius);">
+                        <h4 style="margin-bottom: 10px;">Thống kê báo cáo</h4>
+                        <div style="display: flex; gap: 20px;">
+                            <div>Tổng số buổi: <strong id="sumTotalSessions">0</strong></div>
+                            <div>Tổng sinh viên: <strong id="sumTotalStudents">0</strong></div>
+                        </div>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table" id="attendanceTable">
+                                <thead>
+                                    <!-- Dynamic headers based on view mode (list vs report) -->
+                                    <tr id="tableHeaders">
+                                        <th>STT</th>
+                                        <th>Mã SV</th>
+                                        <th>Họ tên</th>
+                                        <th>Lớp</th>
+                                        <th>Môn học</th>
+                                        <th>Buổi học</th>
+                                        <th>Thời gian điểm danh</th>
+                                        <th>Trạng thái</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attendance-body">
+                                    <tr><td colspan="8" style="text-align: center;">Vui lòng chọn bộ lọc hoặc tải dữ liệu...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

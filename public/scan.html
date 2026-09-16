@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Điểm Danh</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #f4f7f6; }
+        .header { background-color: #3498db; color: white; padding: 15px 20px; display: flex; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .back-btn { color: white; text-decoration: none; margin-right: 15px; font-size: 1.2rem; }
+        .header h1 { margin: 0; font-size: 1.5rem; flex: 1; text-align: center; }
+        .container { padding: 20px; max-width: 500px; margin: 0 auto; }
+        #qr-reader { width: 100%; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.05); background: white; }
+        .hidden { display: none !important; }
+        .section { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); margin-top: 20px; text-align: center; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; margin-bottom: 5px; color: #333; font-weight: bold; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
+        .btn { display: inline-block; background-color: #2ecc71; color: white; border: none; padding: 12px 20px; border-radius: 5px; font-size: 1rem; cursor: pointer; width: 100%; font-weight: bold; transition: background-color 0.3s; }
+        .btn:hover { background-color: #27ae60; }
+        .btn-secondary { background-color: #3498db; margin-top: 15px; }
+        .btn-secondary:hover { background-color: #2980b9; }
+        .success-icon { color: #2ecc71; font-size: 4rem; margin-bottom: 15px; }
+        .student-info { margin-top: 15px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; border-left: 4px solid #3498db; }
+        .student-info p { margin: 5px 0; color: #555; }
+        .student-info strong { color: #333; }
+        
+        /* Loading Overlay */
+        #loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #3498db; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin-bottom: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        /* Toast */
+        #toast-container { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); z-index: 10000; width: 90%; max-width: 400px; }
+        .toast { background-color: #333; color: white; padding: 12px 20px; border-radius: 5px; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.2); text-align: center; opacity: 0; transition: opacity 0.3s; }
+        .toast.success { background-color: #2ecc71; }
+        .toast.error { background-color: #e74c3c; }
+        .toast.show { opacity: 1; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <a href="index.html" class="back-btn">&#8592;</a>
+        <h1>Điểm Danh</h1>
+        <div style="width: 20px;"></div>
+    </div>
+
+    <div class="container">
+        <div id="qr-reader"></div>
+
+        <div id="register-section" class="section hidden">
+            <h3>Đăng ký thiết bị</h3>
+            <p style="color: #7f8c8d; font-size: 0.9rem; margin-bottom: 20px;">Thiết bị này chưa được liên kết với mã sinh viên nào. Vui lòng nhập mã sinh viên để tiếp tục điểm danh.</p>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="student_code">Mã sinh viên:</label>
+                    <input type="text" id="student_code" name="student_code" required placeholder="Nhập mã sinh viên của bạn">
+                </div>
+                <button type="submit" class="btn">Đăng ký & Điểm danh</button>
+                <button type="button" class="btn btn-secondary" onclick="resetScanner()">Hủy</button>
+            </form>
+        </div>
+
+        <div id="result-section" class="section hidden">
+            <div class="success-icon">&#10004;</div>
+            <h3 style="color: #2ecc71; margin-top: 0;">Điểm danh thành công!</h3>
+            <div class="student-info" id="student-info-display">
+                <!-- Info populated dynamically -->
+            </div>
+            <button type="button" class="btn btn-secondary" onclick="resetScanner()">Quét lại</button>
+        </div>
+    </div>
+
+    <div id="loading-overlay" class="hidden">
+        <div class="spinner"></div>
+        <div style="color: #555; font-weight: bold;">Đang xử lý...</div>
+    </div>
+    
+    <div id="toast-container"></div>
+
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/fingerprint.js"></script>
+    <script src="js/scan.js"></script>
+</body>
+</html>

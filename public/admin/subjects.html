@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý môn học - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><span>Quản trị viên</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Bảng điều khiển</a></li>
+                <li><a href="students.html">Sinh viên</a></li>
+                <li><a href="subjects.html" class="active">Môn học</a></li>
+                <li><a href="sessions.html">Buổi học & QR</a></li>
+                <li><a href="attendance.html">Điểm danh</a></li>
+                <li><a href="#" onclick="logout(); return false;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 class="page-title">Quản lý môn học</h1>
+                <div class="user-info"><span>Admin</span></div>
+            </header>
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <span>Danh sách môn học</span>
+                        <button class="btn btn-primary" onclick="openAddSubjectModal()">Thêm môn học</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Mã môn</th>
+                                        <th>Tên môn học</th>
+                                        <th>Số tín chỉ</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="subjects-body">
+                                    <tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Subject Modal -->
+    <div class="modal-overlay" id="subjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="subjectModalTitle">Thêm môn học</h3>
+                <button class="modal-close" onclick="closeModal('subjectModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="subjectForm">
+                    <input type="hidden" id="subjectId">
+                    <div class="form-group">
+                        <label class="form-label">Mã môn *</label>
+                        <input type="text" id="subjectCode" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Tên môn học *</label>
+                        <input type="text" id="subjectName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số tín chỉ</label>
+                        <input type="number" id="credits" class="form-control" min="1" value="3">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('subjectModal')">Hủy</button>
+                <button class="btn btn-primary" onclick="saveSubject()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteSubjectModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Xác nhận xóa</h3>
+                <button class="modal-close" onclick="closeModal('deleteSubjectModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa môn học này không? Hành động này sẽ xóa các buổi học liên quan.</p>
+                <input type="hidden" id="deleteSubjectId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteSubjectModal')">Hủy</button>
+                <button class="btn btn-danger" onclick="confirmDeleteSubject()">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Điểm Danh Sinh Viên</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; min-height: 100vh; background-color: #f4f7f6; }
+        .hero { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
+        .hero h1 { color: #2c3e50; font-size: 2.5rem; margin-bottom: 10px; }
+        .hero p { color: #7f8c8d; font-size: 1.1rem; margin-bottom: 30px; max-width: 600px; }
+        .cta-btn { display: inline-block; background-color: #3498db; color: white; text-decoration: none; padding: 15px 40px; border-radius: 30px; font-size: 1.2rem; font-weight: bold; transition: background-color 0.3s, transform 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .cta-btn:hover { background-color: #2980b9; transform: translateY(-2px); }
+        .admin-link { margin-top: 20px; color: #95a5a6; text-decoration: none; font-size: 0.9rem; }
+        .admin-link:hover { color: #7f8c8d; text-decoration: underline; }
+        footer { background-color: #34495e; color: #ecf0f1; text-align: center; padding: 15px; font-size: 0.9rem; }
+        @media (max-width: 600px) { .hero h1 { font-size: 2rem; } .cta-btn { width: 80%; box-sizing: border-box; } }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Hệ Thống Điểm Danh Sinh Viên</h1>
+        <p>Tiện lợi, nhanh chóng và chính xác. Sinh viên chỉ cần quét mã QR được cung cấp bởi giảng viên để điểm danh cho buổi học.</p>
+        <a href="scan.html" class="cta-btn">Quét QR Điểm Danh</a>
+        <a href="admin.html" class="admin-link">Đăng nhập Admin</a>
+    </div>
+    <footer>
+        &copy; 2026 Trường Đại học. Hệ thống điểm danh sinh viên.
+    </footer>
+</body>
+</html>

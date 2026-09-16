@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sinh viên - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header"><span>Quản trị viên</span></div>
+            <ul class="sidebar-menu">
+                <li><a href="dashboard.html">Bảng điều khiển</a></li>
+                <li><a href="students.html" class="active">Sinh viên</a></li>
+                <li><a href="subjects.html">Môn học</a></li>
+                <li><a href="sessions.html">Buổi học & QR</a></li>
+                <li><a href="attendance.html">Điểm danh</a></li>
+                <li><a href="#" onclick="logout(); return false;">Đăng xuất</a></li>
+            </ul>
+        </aside>
+
+        <main class="main-content">
+            <header class="page-header">
+                <button class="mobile-toggle" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+                <h1 class="page-title">Quản lý sinh viên</h1>
+                <div class="user-info"><span>Admin</span></div>
+            </header>
+
+            <div class="content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="search-bar" style="display: flex; gap: 10px;">
+                            <input type="text" id="searchInput" class="form-control" placeholder="Tìm theo tên hoặc mã SV..." style="width: 300px;">
+                            <button class="btn btn-outline" onclick="loadStudents(1)">Tìm kiếm</button>
+                        </div>
+                        <div>
+                            <button class="btn btn-success" onclick="openImportModal()">Import CSV</button>
+                            <button class="btn btn-primary" onclick="openAddStudentModal()">Thêm sinh viên</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Mã SV</th>
+                                        <th>Họ tên</th>
+                                        <th>Lớp</th>
+                                        <th>Email</th>
+                                        <th>SĐT</th>
+                                        <th>Hành động</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="students-body">
+                                    <tr><td colspan="7" style="text-align: center;">Đang tải...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <ul class="pagination" id="pagination"></ul>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add/Edit Student Modal -->
+    <div class="modal-overlay" id="studentModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 id="studentModalTitle">Thêm sinh viên</h3>
+                <button class="modal-close" onclick="closeModal('studentModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="studentForm">
+                    <input type="hidden" id="studentId">
+                    <div class="form-group">
+                        <label class="form-label">Mã SV *</label>
+                        <input type="text" id="studentCode" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Họ tên *</label>
+                        <input type="text" id="fullName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Lớp</label>
+                        <input type="text" id="className" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" id="email" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" id="phone" class="form-control">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('studentModal')">Hủy</button>
+                <button class="btn btn-primary" onclick="saveStudent()">Lưu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import CSV Modal -->
+    <div class="modal-overlay" id="importModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Import Sinh viên từ CSV</h3>
+                <button class="modal-close" onclick="closeModal('importModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom: 10px; font-size: 0.9em; color: var(--gray-600);">
+                    Dán nội dung CSV vào bên dưới. Định dạng: <strong>Mã SV, Họ tên, Lớp, Email, SĐT</strong> (Không bao gồm dòng tiêu đề)
+                </p>
+                <textarea id="csvData" class="form-control" rows="10" placeholder="SV001, Nguyen Van A, IT01, a@email.com, 0123456789..."></textarea>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('importModal')">Hủy</button>
+                <button class="btn btn-success" onclick="importStudents()">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirm Modal -->
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Xác nhận xóa</h3>
+                <button class="modal-close" onclick="closeModal('deleteModal')">×</button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sinh viên này không? Hành động này không thể hoàn tác.</p>
+                <input type="hidden" id="deleteId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeModal('deleteModal')">Hủy</button>
+                <button class="btn btn-danger" onclick="confirmDeleteStudent()">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+    <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+
+    <script src="../js/admin.js"></script>
+</body>
+</html>

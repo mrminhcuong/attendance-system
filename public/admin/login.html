@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập Admin - Hệ thống điểm danh</title>
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="login-page">
+    <div class="login-card">
+        <h2 class="login-title">Đăng nhập Quản trị</h2>
+        <form id="loginForm">
+            <div class="form-group">
+                <label class="form-label" for="username">Tên đăng nhập</label>
+                <input type="text" id="username" class="form-control" required>
+            </div>
+            <div class="form-group">
+                <label class="form-label" for="password">Mật khẩu</label>
+                <input type="password" id="password" class="form-control" required>
+            </div>
+            <div id="error-msg" style="color: var(--danger); margin-bottom: 15px; display: none;"></div>
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Đăng nhập</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const errorMsg = document.getElementById('error-msg');
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+
+            errorMsg.style.display = 'none';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Đang xử lý...';
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('adminToken', data.token);
+                    window.location.href = 'dashboard.html';
+                } else {
+                    errorMsg.textContent = data.message || 'Đăng nhập thất bại';
+                    errorMsg.style.display = 'block';
+                }
+            } catch (error) {
+                errorMsg.textContent = 'Lỗi kết nối máy chủ';
+                errorMsg.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Đăng nhập';
+            }
+        });
+
+        // Check if already logged in
+        if (localStorage.getItem('adminToken')) {
+            window.location.href = 'dashboard.html';
+        }
+    </script>
+</body>
+</html>
