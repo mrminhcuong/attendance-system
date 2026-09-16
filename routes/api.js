@@ -53,12 +53,14 @@ router.post('/register-device', (req, res) => {
 
         const existingDevice = db.prepare('SELECT id FROM devices WHERE device_fingerprint = ?').get(deviceFingerprint);
         
+        const deviceInfoStr = deviceInfo ? JSON.stringify(deviceInfo) : null;
+        
         if (existingDevice) {
             db.prepare('UPDATE devices SET student_id = ?, device_info = ?, last_seen = CURRENT_TIMESTAMP WHERE id = ?')
-              .run(student.id, deviceInfo || null, existingDevice.id);
+              .run(student.id, deviceInfoStr, existingDevice.id);
         } else {
             db.prepare('INSERT INTO devices (device_fingerprint, student_id, device_info) VALUES (?, ?, ?)')
-              .run(deviceFingerprint, student.id, deviceInfo || null);
+              .run(deviceFingerprint, student.id, deviceInfoStr);
         }
 
         res.json({
