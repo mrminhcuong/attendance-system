@@ -55,10 +55,12 @@ class DatabaseWrapper {
             // Run (insert/update/delete)
             run(...params) {
                 self.db.run(sql, params);
+                const changes = self.db.getRowsModified();
+                const lastInsertRowid = getLastInsertRowId(self.db);
                 self.save();
                 return {
-                    changes: self.db.getRowsModified(),
-                    lastInsertRowid: getLastInsertRowId(self.db)
+                    changes,
+                    lastInsertRowid
                 };
             }
         };
