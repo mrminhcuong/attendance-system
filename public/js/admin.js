@@ -525,12 +525,12 @@ function openCreateSessionModal() {
 async function createSession() {
     const session = {
         subject_id: document.getElementById('sessionSubject').value,
-        date: document.getElementById('sessionDate').value,
+        session_date: document.getElementById('sessionDate').value,
         start_time: document.getElementById('startTime').value,
         end_time: document.getElementById('endTime').value
     };
     
-    if(!session.subject_id || !session.date || !session.start_time || !session.end_time) {
+    if(!session.subject_id || !session.session_date || !session.start_time || !session.end_time) {
         showToast('Vui lòng điền đủ thông tin', 'warning');
         return;
     }
