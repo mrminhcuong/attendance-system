@@ -3,7 +3,7 @@ const router = express.Router();
 const { getDb } = require('../database');
 
 // POST /check-device
-router.post('/check-device', (req, res) => {
+router.post('/check-device', async (req, res) => {
     try {
         const db = getDb();
         const { deviceFingerprint } = req.body;
@@ -11,15 +11,15 @@ router.post('/check-device', (req, res) => {
             return res.status(400).json({ error: 'Thiếu thông tin thiết bị' });
         }
 
-        const device = db.prepare(`
+        const device = await db.get(`
             SELECT d.*, s.student_code, s.full_name, s.class_name
             FROM devices d
             JOIN students s ON d.student_id = s.id
             WHERE d.device_fingerprint = ?
-        `).get(deviceFingerprint);
+        `, deviceFingerprint);
 
         if (device) {
-            db.prepare('UPDATE devices SET last_seen = CURRENT_TIMESTAMP WHERE id = ?').run(device.id);
+            await db.run('UPDATE devices SET last_seen = CURRENT_TIMESTAMP WHERE id = ?', device.id);
             return res.json({
                 registered: true,
                 student: {
@@ -38,7 +38,7 @@ router.post('/check-device', (req, res) => {
 });
 
 // POST /register-device
-router.post('/register-device', (req, res) => {
+router.post('/register-device', async (req, res) => {
     try {
         const db = getDb();
         const { deviceFingerprint, studentCode, full_name, email, deviceInfo } = req.body;
@@ -46,12 +46,11 @@ router.post('/register-device', (req, res) => {
             return res.status(400).json({ error: 'Thiếu thông tin yêu cầu' });
         }
 
-        let student = db.prepare('SELECT * FROM students WHERE student_code = ?').get(studentCode);
+        let student = await db.get('SELECT * FROM students WHERE student_code = ?', studentCode);
         
         // TỰ ĐỘNG THÊM SINH VIÊN MỚI NẾU CHƯA TỒN TẠI
         if (!student) {
-            const result = db.prepare('INSERT INTO students (student_code, full_name, email) VALUES (?, ?, ?)')
-                             .run(studentCode, full_name, email || null);
+            const result = await db.run('INSERT INTO students (student_code, full_name, email) VALUES (?, ?, ?)', studentCode, full_name, email || null);
             student = {
                 id: result.lastInsertRowid,
                 student_code: studentCode,
@@ -61,26 +60,24 @@ router.post('/register-device', (req, res) => {
         } else {
             // Cập nhật email nếu có và chưa có email
             if (email && !student.email) {
-                db.prepare('UPDATE students SET email = ? WHERE id = ?').run(email, student.id);
+                await db.run('UPDATE students SET email = ? WHERE id = ?', email, student.id);
             }
         }
 
         // CHỐNG ĐIỂM DANH HỘ: Kiểm tra xem sinh viên này đã đăng ký thiết bị nào chưa
-        const studentDevice = db.prepare('SELECT device_fingerprint FROM devices WHERE student_id = ?').get(student.id);
+        const studentDevice = await db.get('SELECT device_fingerprint FROM devices WHERE student_id = ?', student.id);
         if (studentDevice && studentDevice.device_fingerprint !== deviceFingerprint) {
             return res.status(403).json({ error: 'Mã sinh viên này đã được đăng ký trên thiết bị khác' });
         }
 
-        const existingDevice = db.prepare('SELECT id FROM devices WHERE device_fingerprint = ?').get(deviceFingerprint);
+        const existingDevice = await db.get('SELECT id FROM devices WHERE device_fingerprint = ?', deviceFingerprint);
         
         const deviceInfoStr = deviceInfo ? JSON.stringify(deviceInfo) : null;
         
         if (existingDevice) {
-            db.prepare('UPDATE devices SET student_id = ?, device_info = ?, last_seen = CURRENT_TIMESTAMP WHERE id = ?')
-              .run(student.id, deviceInfoStr, existingDevice.id);
+            await db.run('UPDATE devices SET student_id = ?, device_info = ?, last_seen = CURRENT_TIMESTAMP WHERE id = ?', student.id, deviceInfoStr, existingDevice.id);
         } else {
-            db.prepare('INSERT INTO devices (device_fingerprint, student_id, device_info) VALUES (?, ?, ?)')
-              .run(deviceFingerprint, student.id, deviceInfoStr);
+            await db.run('INSERT INTO devices (device_fingerprint, student_id, device_info) VALUES (?, ?, ?)', deviceFingerprint, student.id, deviceInfoStr);
         }
 
         res.json({
@@ -99,7 +96,7 @@ router.post('/register-device', (req, res) => {
 });
 
 // POST /attendance/check-in
-router.post('/attendance/check-in', (req, res) => {
+router.post('/attendance/check-in', async (req, res) => {
     try {
         const db = getDb();
         const { deviceFingerprint, qrToken } = req.body;
@@ -108,12 +105,12 @@ router.post('/attendance/check-in', (req, res) => {
         }
 
         // Validate session
-        const session = db.prepare(`
+        const session = await db.get(`
             SELECT s.*, sub.subject_name 
             FROM sessions s
             JOIN subjects sub ON s.subject_id = sub.id
             WHERE s.qr_token = ?
-        `).get(qrToken);
+        `, qrToken);
 
         if (!session) {
             return res.status(404).json({ error: 'Không tìm thấy buổi học' });
@@ -132,30 +129,29 @@ router.post('/attendance/check-in', (req, res) => {
         }
 
         // Get student from device
-        const device = db.prepare(`
+        const device = await db.get(`
             SELECT d.*, st.student_code, st.full_name, st.class_name
             FROM devices d
             JOIN students st ON d.student_id = st.id
             WHERE d.device_fingerprint = ?
-        `).get(deviceFingerprint);
+        `, deviceFingerprint);
 
         if (!device) {
             return res.status(403).json({ error: 'Thiết bị chưa được đăng ký' });
         }
 
         // Check already checked in
-        const existingAttendance = db.prepare('SELECT id FROM attendance WHERE student_id = ? AND session_id = ?')
-            .get(device.student_id, session.id);
+        const existingAttendance = await db.get('SELECT id FROM attendance WHERE student_id = ? AND session_id = ?', device.student_id, session.id);
 
         if (existingAttendance) {
             return res.status(400).json({ error: 'Sinh viên đã điểm danh trong buổi học này' });
         }
 
         // Insert attendance
-        db.prepare(`
+        await db.run(`
             INSERT INTO attendance (student_id, session_id, device_fingerprint, status) 
             VALUES (?, ?, ?, 'present')
-        `).run(device.student_id, session.id, deviceFingerprint);
+        `, device.student_id, session.id, deviceFingerprint);
 
         res.json({
             success: true,
@@ -174,10 +170,10 @@ router.post('/attendance/check-in', (req, res) => {
 });
 
 // GET /student/:code
-router.get('/student/:code', (req, res) => {
+router.get('/student/:code', async (req, res) => {
     try {
         const db = getDb();
-        const student = db.prepare('SELECT * FROM students WHERE student_code = ?').get(req.params.code);
+        const student = await db.get('SELECT * FROM students WHERE student_code = ?', req.params.code);
         if (!student) {
             return res.status(404).json({ error: 'Không tìm thấy sinh viên' });
         }
@@ -189,15 +185,15 @@ router.get('/student/:code', (req, res) => {
 });
 
 // GET /session/:token
-router.get('/session/:token', (req, res) => {
+router.get('/session/:token', async (req, res) => {
     try {
         const db = getDb();
-        const session = db.prepare(`
+        const session = await db.get(`
             SELECT s.*, sub.subject_name, sub.subject_code
             FROM sessions s
             JOIN subjects sub ON s.subject_id = sub.id
             WHERE s.qr_token = ?
-        `).get(req.params.token);
+        `, req.params.token);
         
         if (!session) {
             return res.status(404).json({ error: 'Không tìm thấy buổi học' });

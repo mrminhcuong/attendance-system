@@ -25,7 +25,7 @@ async function startServer() {
             console.log(`🚀 Server đang chạy tại http://localhost:${PORT}`);
             console.log(`📱 Trang điểm danh: http://localhost:${PORT}/scan.html`);
             console.log(`🔧 Trang quản trị: http://localhost:${PORT}/admin/login.html`);
-            console.log(`   Tài khoản: admin / admin123`);
+            console.log(`   Tài khoản: admin / adminbp123!@#`);
         });
     } catch (error) {
         console.error('❌ Lỗi khởi động server:', error);
